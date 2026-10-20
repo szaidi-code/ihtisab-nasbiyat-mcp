@@ -1,0 +1,76 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Ihtisab-e-Nasbiyat MCP Server (مجموعہ کتب احتساب ناصبیت)</title>
+  <style>
+    body {
+      font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+      max-width: 920px;
+      margin: 2rem auto;
+      padding: 0 1.5rem;
+      line-height: 1.6;
+      color: #1e293b;
+      background: #f8fafc;
+    }
+    h1, h2, h3 { color: #0f172a; }
+    .card {
+      background: #ffffff;
+      border: 1px solid #e2e8f0;
+      border-radius: 10px;
+      padding: 1.25rem 1.5rem;
+      margin-bottom: 1.25rem;
+      box-shadow: 0 1px 2px rgba(0,0,0,0.04);
+    }
+    code, pre {
+      background: #0f172a;
+      color: #f8fafc;
+      border-radius: 6px;
+      font-family: ui-monospace, SFMono-Regular, Menlo, monospace;
+    }
+    code { padding: 0.15rem 0.4rem; font-size: 0.9em; }
+    pre { padding: 1rem; overflow-x: auto; }
+    .badge {
+      display: inline-block;
+      background: #047857;
+      color: #fff;
+      padding: 0.2rem 0.6rem;
+      border-radius: 999px;
+      font-size: 0.8rem;
+      font-weight: 600;
+    }
+  </style>
+</head>
+<body>
+  <div class="card">
+    <span class="badge">MCP Server v1.0.0</span>
+    <h1>Majmua Kutub Ihtisab-e-Nasbiyat MCP Server</h1>
+    <p><strong>مجموعہ کتب احتساب ناصبیت</strong> — 12 Volumes &bull; 54 Books &bull; 2,277 English-Translated Chapters &bull; 5,991 Pages</p>
+    <p>Streamable HTTP MCP Endpoint: <code>/mcp</code> &bull; Health Check: <a href="/health"><code>/health</code></a></p>
+  </div>
+
+  <div class="card">
+    <h2>MCP Configuration (<code>mcp_config.json</code>)</h2>
+    <pre>{
+  "mcpServers": {
+    "ihtisab-nasbiyat": {
+      "url": "https://ihtisab-nasbiyat-mcp.onrender.com/mcp"
+    }
+  }
+}</pre>
+  </div>
+
+  <div class="card">
+    <h2>Available MCP Tools</h2>
+    <ul>
+      <li><code>list_volumes</code> — Lists all 12 volumes, total pages, book counts, and chapter counts.</li>
+      <li><code>list_books</code> — Lists all 54 books with English &amp; Urdu titles, authors, page boundaries, and scholarly summaries.</li>
+      <li><code>get_book_details</code> — Retrieves full metadata, English summary, and complete English &amp; Urdu Table of Contents for any book (1–54).</li>
+      <li><code>search_catalog</code> — Full-text SQLite FTS5 search in English, Urdu, or transliterated terms across all 54 books, 2,277 chapter headings, and translated pages.</li>
+      <li><code>extract_pdf_pages</code> — Renders 1–10 pages from a volume and returns cached English translations.</li>
+      <li><code>save_page_translation</code> — Indexes full-page English &amp; Urdu translations into the SQLite FTS5 database.</li>
+    </ul>
+  </div>
+</body>
+</html>

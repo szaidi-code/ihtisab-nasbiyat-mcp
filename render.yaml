@@ -1,0 +1,8 @@
+services:
+  - type: web
+    name: ihtisab-nasbiyat-mcp
+    env: python
+    plan: free
+    buildCommand: python3 build_db.py
+    startCommand: python3 server.py
+    healthCheckPath: /health
