@@ -448,8 +448,8 @@ def draw_wrapped_centered_lines(
 
 def make_page_decorator(vol_num: int, vol_title: str, authors_str: str, translators_str: str, medallion_img: Optional[Path]):
     """
-    Draws Page 2 (the full Al-Islam.org floral arabesque cover page) when doc.page == 2,
-    and leaves all other pages with clean white margins (matching 18725).
+    Draws Page 2 using the original volume cover image from the PDF as a full cover picture
+    (with no Al-Islam.org floral background or badge), and leaves all other pages with clean white margins.
     """
 
     def on_page(canvas, doc):
@@ -461,122 +461,21 @@ def make_page_decorator(vol_num: int, vol_title: str, authors_str: str, translat
         box_y = MARGIN_TB
         box_w = PAGE_W - 2 * MARGIN_LR
         box_h = PAGE_H - 2 * MARGIN_TB
-        center_x = PAGE_W / 2.0
 
-        # 1. Floral Arabesque Background inside Cover Frame
-        if FLORAL_BG_PATH.exists():
+        if medallion_img and medallion_img.exists():
             canvas.drawImage(
-                str(FLORAL_BG_PATH),
+                str(medallion_img),
                 box_x,
                 box_y,
                 width=box_w,
                 height=box_h,
-                preserveAspectRatio=False,
+                preserveAspectRatio=True,
+                anchor="c",
             )
         else:
-            canvas.setFillColor(colors.HexColor("#EBF4F6"))
-            canvas.rect(box_x, box_y, box_w, box_h, fill=1, stroke=0)
-
-        # Thin gray outer border matching page-002.jpg
-        canvas.setStrokeColor(colors.HexColor("#888888"))
-        canvas.setLineWidth(0.8)
-        canvas.rect(box_x, box_y, box_w, box_h, fill=0, stroke=1)
-
-        # 2. Large Bold Title at Top of Cover
-        draw_wrapped_centered_lines(
-            canvas,
-            vol_title,
-            FONT_BOLD,
-            26,
-            33,
-            center_x,
-            PAGE_H - 155,
-            box_w - 60,
-            fill_color=colors.HexColor("#0A0A0A"),
-            halo_color=colors.white,
-        )
-
-        # 3. Center Rounded White Medallion Frame (matching page-002.jpg center portrait box)
-        med_size = 104
-        med_x = center_x - med_size / 2.0
-        med_y = PAGE_H / 2.0 + 18
-        canvas.setFillColor(colors.white)
-        canvas.setStrokeColor(colors.HexColor("#DDDDDD"))
-        canvas.setLineWidth(1.5)
-        canvas.roundRect(med_x - 4, med_y - 4, med_size + 8, med_size + 8, 8, fill=1, stroke=1)
-        if medallion_img and medallion_img.exists():
-            canvas.drawImage(
-                str(medallion_img),
-                med_x,
-                med_y,
-                width=med_size,
-                height=med_size,
-                preserveAspectRatio=False,
-            )
-
-        # 4. Dark Semi-Transparent Horizontal Author Banner across Middle-Lower Cover
-        banner_h = 84
-        banner_y = PAGE_H / 2.0 - 95
-        canvas.saveState()
-        try:
-            canvas.setFillColor(colors.Color(0.14, 0.14, 0.14, alpha=0.84))
-        except Exception:
-            canvas.setFillColor(colors.HexColor("#262626"))
-        canvas.rect(box_x, banner_y, box_w, banner_h, fill=1, stroke=0)
-        canvas.restoreState()
-
-        draw_wrapped_centered_lines(
-            canvas,
-            authors_str,
-            FONT_BOLD,
-            15.5,
-            21,
-            center_x,
-            banner_y + banner_h - 29,
-            box_w - 50,
-            fill_color=colors.white,
-        )
-
-        # 5. "Translated by ..." below the Dark Banner
-        y_trans = banner_y - 52
-        draw_wrapped_centered_lines(
-            canvas,
-            "Translated by",
-            FONT_BOLD,
-            13.5,
-            18,
-            center_x,
-            y_trans,
-            box_w - 60,
-            fill_color=colors.HexColor("#0A0A0A"),
-            halo_color=colors.white,
-        )
-        draw_wrapped_centered_lines(
-            canvas,
-            translators_str,
-            FONT_BOLD,
-            13.5,
-            18,
-            center_x,
-            y_trans - 20,
-            box_w - 60,
-            fill_color=colors.HexColor("#0A0A0A"),
-            halo_color=colors.white,
-        )
-
-        # 6. Bottom Al-Islam.org Pill Badge
-        if BADGE_PATH.exists():
-            bw = 122
-            bh = 30.4
-            canvas.drawImage(
-                str(BADGE_PATH),
-                center_x - bw / 2.0,
-                box_y + 115,
-                width=bw,
-                height=bh,
-                preserveAspectRatio=True,
-                mask="auto",
-            )
+            canvas.setStrokeColor(colors.HexColor("#888888"))
+            canvas.setLineWidth(0.8)
+            canvas.rect(box_x, box_y, box_w, box_h, fill=0, stroke=1)
 
         canvas.restoreState()
 
@@ -633,7 +532,7 @@ def build_volume_pdf(vol_num: int, output_path: Path) -> None:
         bottomMargin=MARGIN_TB,
         title=vol_title,
         author=cover_authors_str,
-        creator="Al-Islam.org Style Book Exporter — Ihtisab-e-Nasbiyat Digital Library",
+        creator="Ihtisab-e-Nasbiyat Digital Library",
     )
 
     styles = getSampleStyleSheet()
