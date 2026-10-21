@@ -190,25 +190,28 @@ def sanitize_database(db_path: Path = DB_PATH) -> None:
     conn.close()
 
 
-def add_header_footer(canvas, doc):
-    canvas.saveState()
-    canvas.setFont(FONT_REGULAR, 8.5)
-    canvas.setFillColor(colors.HexColor("#555555"))
-    canvas.drawString(
-        0.65 * inch,
-        10.55 * inch,
-        "Majmua Kutub Ihtisab-e-Nasbiyat — Volume 1 Complete English Translation (Books 1-9)",
-    )
-    canvas.drawRightString(
-        8.5 * inch - 0.65 * inch,
-        0.45 * inch,
-        f"Page {doc.page}",
-    )
-    canvas.setStrokeColor(colors.HexColor("#CCCCCC"))
-    canvas.setLineWidth(0.5)
-    canvas.line(0.65 * inch, 10.45 * inch, 8.5 * inch - 0.65 * inch, 10.45 * inch)
-    canvas.line(0.65 * inch, 0.60 * inch, 8.5 * inch - 0.65 * inch, 0.60 * inch)
-    canvas.restoreState()
+def make_header_footer(header_text: str):
+    def add_header_footer(canvas, doc):
+        canvas.saveState()
+        canvas.setFont(FONT_REGULAR, 8.5)
+        canvas.setFillColor(colors.HexColor("#555555"))
+        canvas.drawString(
+            0.65 * inch,
+            10.55 * inch,
+            header_text,
+        )
+        canvas.drawRightString(
+            8.5 * inch - 0.65 * inch,
+            0.45 * inch,
+            f"Page {doc.page}",
+        )
+        canvas.setStrokeColor(colors.HexColor("#CCCCCC"))
+        canvas.setLineWidth(0.5)
+        canvas.line(0.65 * inch, 10.45 * inch, 8.5 * inch - 0.65 * inch, 10.45 * inch)
+        canvas.line(0.65 * inch, 0.60 * inch, 8.5 * inch - 0.65 * inch, 0.60 * inch)
+        canvas.restoreState()
+
+    return add_header_footer
 
 
 def build_volume_pdf(vol_num: int, output_path: Path) -> None:
@@ -399,7 +402,12 @@ def build_volume_pdf(vol_num: int, output_path: Path) -> None:
         story.append(Spacer(1, 0.1 * inch))
         story.append(HRFlowable(width="100%", thickness=0.5, color=colors.HexColor("#E2E8F0")))
 
-    doc.build(story, onFirstPage=add_header_footer, onLaterPages=add_header_footer)
+    if books:
+        b_range = f"Books {books[0]['book_number']}-{books[-1]['book_number']}" if len(books) > 1 else f"Book {books[0]['book_number']}"
+    else:
+        b_range = ""
+    hf = make_header_footer(f"Majmua Kutub Ihtisab-e-Nasbiyat — Volume {vol_num} Complete English Translation ({b_range})")
+    doc.build(story, onFirstPage=hf, onLaterPages=hf)
     print(f"Exported clean human-readable Volume {vol_num} English PDF ({len(pages)} pages) -> {output_path}")
 
 
