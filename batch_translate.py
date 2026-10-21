@@ -21,15 +21,16 @@ import time
 from pathlib import Path
 from typing import Optional
 
+from export_volume_pdf import clean_human_readable_english
 from server import RENDER_DIR, get_db, save_page_translation
 
 PROMPT = """You are an expert translator of classical Islamic Urdu and Arabic texts.
 Analyze this scanned page from 'Majmua Kutub Ihtisab-e-Nasbiyat' and return a JSON object with:
 {
   "text_urdu": "Complete, accurate Urdu/Arabic transcription of the page",
-  "text_english": "Complete, faithful scholarly English translation of the entire page, preserving all Hadith, historical, and Rijal references",
-  "summary_english": "1-2 sentence English summary of the key arguments on this page",
-  "citations": "Comma-separated list of primary classical sources, books, and scholars cited on this page"
+  "text_english": "Complete, faithful scholarly English translation of the entire page, preserving all Hadith, historical, and Rijal references. Use plain, human-readable English letters for transliterated names and book titles (e.g., Ihtisab-e-Qadiyaniyyat, Mawlana Muhammad Yusuf Ludhyanwi) without special diacritical symbols like ā, ī, ū, ḥ, ṣ, ḍ, ṭ, ẓ, and do not leave untranslated Arabic script inside the English fields.",
+  "summary_english": "1-2 sentence English summary of the key arguments on this page (plain English letters only)",
+  "citations": "Comma-separated list of primary classical sources, books, and scholars cited on this page (plain human-readable English letters only)"
 }
 Return ONLY valid JSON."""
 
@@ -131,9 +132,9 @@ def process_one_page(
             book_page=b_num,
             book_number=book_num,
             text_urdu=str(data.get("text_urdu", "")),
-            text_english=str(data.get("text_english", "")),
-            summary_english=str(data.get("summary_english", "")),
-            citations=str(citations_val),
+            text_english=clean_human_readable_english(str(data.get("text_english", ""))),
+            summary_english=clean_human_readable_english(str(data.get("summary_english", ""))),
+            citations=clean_human_readable_english(str(citations_val)),
         )
         counter[0] += 1
         elapsed = time.time() - t0
